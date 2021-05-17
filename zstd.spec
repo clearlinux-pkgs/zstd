@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : zstd
 Version  : 1.5.0
-Release  : 66
+Release  : 68
 URL      : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source0  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source1  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz.sig
@@ -146,7 +146,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1621261896
+export SOURCE_DATE_EPOCH=1621262761
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -170,6 +170,8 @@ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --
 ninja -v -C builddir
 CFLAGS="$CFLAGS -m64 -march=haswell" CXXFLAGS="$CXXFLAGS -m64 -march=haswell " LDFLAGS="$LDFLAGS -m64 -march=haswell" meson --libdir=lib64/haswell --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx2
 ninja -v -C builddiravx2
+CFLAGS="$CFLAGS -m64 -march=skylake-avx512" CXXFLAGS="$CXXFLAGS -m64 -march=skylake-avx512 " LDFLAGS="$LDFLAGS -m64 -march=skylake-avx512" meson --libdir=lib64/haswell/avx512_1 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx512
+ninja -v -C builddiravx512
 popd
 pushd ../build32/build/meson
 export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
@@ -195,12 +197,15 @@ popd
 fi
 popd
 pushd build/meson
+DESTDIR=%{buildroot} ninja -C builddiravx512 install
 DESTDIR=%{buildroot} ninja -C builddiravx2 install
 DESTDIR=%{buildroot} ninja -C builddir install
 popd
 
 %files
 %defattr(-,root,root,-)
+/usr/lib64/haswell/avx512_1/libzstd.a
+/usr/lib64/haswell/avx512_1/pkgconfig/libzstd.pc
 /usr/lib64/haswell/pkgconfig/libzstd.pc
 
 %files bin
@@ -218,6 +223,7 @@ popd
 /usr/include/zdict.h
 /usr/include/zstd.h
 /usr/include/zstd_errors.h
+/usr/lib64/haswell/avx512_1/libzstd.so
 /usr/lib64/haswell/libzstd.so
 /usr/lib64/libzstd.so
 /usr/lib64/pkgconfig/libzstd.pc
@@ -230,6 +236,8 @@ popd
 
 %files lib
 %defattr(-,root,root,-)
+/usr/lib64/haswell/avx512_1/libzstd.so.1
+/usr/lib64/haswell/avx512_1/libzstd.so.1.5.0
 /usr/lib64/haswell/libzstd.so.1
 /usr/lib64/haswell/libzstd.so.1.5.0
 /usr/lib64/libzstd.so.1
