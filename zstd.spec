@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : zstd
 Version  : 1.5.0
-Release  : 65
+Release  : 66
 URL      : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source0  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source1  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz.sig
@@ -137,13 +137,16 @@ popd
 pushd ..
 cp -a zstd-1.5.0 buildavx2
 popd
+pushd ..
+cp -a zstd-1.5.0 buildavx512
+popd
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1621261522
+export SOURCE_DATE_EPOCH=1621261896
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
