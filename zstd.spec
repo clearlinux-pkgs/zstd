@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : zstd
 Version  : 1.5.0
-Release  : 68
+Release  : 69
 URL      : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source0  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source1  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz.sig
@@ -146,7 +146,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1621262761
+export SOURCE_DATE_EPOCH=1621362027
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -204,9 +204,6 @@ popd
 
 %files
 %defattr(-,root,root,-)
-/usr/lib64/haswell/avx512_1/libzstd.a
-/usr/lib64/haswell/avx512_1/pkgconfig/libzstd.pc
-/usr/lib64/haswell/pkgconfig/libzstd.pc
 
 %files bin
 %defattr(-,root,root,-)
@@ -224,7 +221,9 @@ popd
 /usr/include/zstd.h
 /usr/include/zstd_errors.h
 /usr/lib64/haswell/avx512_1/libzstd.so
+/usr/lib64/haswell/avx512_1/pkgconfig/libzstd.pc
 /usr/lib64/haswell/libzstd.so
+/usr/lib64/haswell/pkgconfig/libzstd.pc
 /usr/lib64/libzstd.so
 /usr/lib64/pkgconfig/libzstd.pc
 
@@ -264,6 +263,7 @@ popd
 
 %files staticdev
 %defattr(-,root,root,-)
+/usr/lib64/haswell/avx512_1/libzstd.a
 /usr/lib64/haswell/libzstd.a
 /usr/lib64/libzstd.a
 
