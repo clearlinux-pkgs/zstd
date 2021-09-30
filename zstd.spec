@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : zstd
 Version  : 1.5.0
-Release  : 70
+Release  : 71
 URL      : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source0  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source1  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz.sig
@@ -146,15 +146,15 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1621362027
+export SOURCE_DATE_EPOCH=1633017099
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FCFLAGS="$FFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FFLAGS="$FFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export CFLAGS="$CFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=256 "
+export FCFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=256 "
+export FFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=256 "
+export CXXFLAGS="$CXXFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=256 "
 export CFLAGS_GENERATE="$CFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
 export FCFLAGS_GENERATE="$FCFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
 export FFLAGS_GENERATE="$FFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
@@ -168,13 +168,13 @@ export LDFLAGS_USE="$LDFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-
 pushd build/meson
 CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddir
 ninja -v -C builddir
-CFLAGS="$CFLAGS -m64 -march=haswell" CXXFLAGS="$CXXFLAGS -m64 -march=haswell " LDFLAGS="$LDFLAGS -m64 -march=haswell" meson --libdir=lib64/haswell --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx2
+CFLAGS="$CFLAGS -m64 -march=x86-64-v3" CXXFLAGS="$CXXFLAGS -m64 -march=x86-64-v3 " LDFLAGS="$LDFLAGS -m64 -march=x86-64-v3" meson --libdir=lib64/x86-64-v3 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx2
 ninja -v -C builddiravx2
 CFLAGS="$CFLAGS -m64 -march=skylake-avx512" CXXFLAGS="$CXXFLAGS -m64 -march=skylake-avx512 " LDFLAGS="$LDFLAGS -m64 -march=skylake-avx512" meson --libdir=lib64/haswell/avx512_1 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx512
 ninja -v -C builddiravx512
 popd
 pushd ../build32/build/meson
-export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
+export PKG_CONFIG_PATH="/usr/lib32/pkgconfig:/usr/share/pkgconfig"
 export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
 export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32 -mstackrealign"
 export CXXFLAGS="${CXXFLAGS}${CXXFLAGS:+ }-m32 -mstackrealign"
@@ -195,6 +195,12 @@ pushd %{buildroot}/usr/lib32/pkgconfig
 for i in *.pc ; do ln -s $i 32$i ; done
 popd
 fi
+if [ -d %{buildroot}/usr/share/pkgconfig ]
+then
+pushd %{buildroot}/usr/share/pkgconfig
+for i in *.pc ; do ln -s $i 32$i ; done
+popd
+fi
 popd
 pushd build/meson
 DESTDIR=%{buildroot} ninja -C builddiravx512 install
@@ -204,6 +210,8 @@ popd
 
 %files
 %defattr(-,root,root,-)
+/usr/lib64/x86-64-v3/libzstd.a
+/usr/lib64/x86-64-v3/pkgconfig/libzstd.pc
 
 %files bin
 %defattr(-,root,root,-)
@@ -222,8 +230,6 @@ popd
 /usr/include/zstd_errors.h
 /usr/lib64/haswell/avx512_1/libzstd.so
 /usr/lib64/haswell/avx512_1/pkgconfig/libzstd.pc
-/usr/lib64/haswell/libzstd.so
-/usr/lib64/haswell/pkgconfig/libzstd.pc
 /usr/lib64/libzstd.so
 /usr/lib64/pkgconfig/libzstd.pc
 
@@ -237,10 +243,11 @@ popd
 %defattr(-,root,root,-)
 /usr/lib64/haswell/avx512_1/libzstd.so.1
 /usr/lib64/haswell/avx512_1/libzstd.so.1.5.0
-/usr/lib64/haswell/libzstd.so.1
-/usr/lib64/haswell/libzstd.so.1.5.0
 /usr/lib64/libzstd.so.1
 /usr/lib64/libzstd.so.1.5.0
+/usr/lib64/x86-64-v3/libzstd.so
+/usr/lib64/x86-64-v3/libzstd.so.1
+/usr/lib64/x86-64-v3/libzstd.so.1.5.0
 
 %files lib32
 %defattr(-,root,root,-)
@@ -264,7 +271,6 @@ popd
 %files staticdev
 %defattr(-,root,root,-)
 /usr/lib64/haswell/avx512_1/libzstd.a
-/usr/lib64/haswell/libzstd.a
 /usr/lib64/libzstd.a
 
 %files staticdev32
