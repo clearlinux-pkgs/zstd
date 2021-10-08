@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : zstd
 Version  : 1.5.0
-Release  : 71
+Release  : 72
 URL      : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source0  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source1  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz.sig
@@ -15,6 +15,7 @@ Summary  : Fast lossless compression algorithm library and tools
 Group    : Development/Tools
 License  : BSD-3-Clause GPL-2.0
 Requires: zstd-bin = %{version}-%{release}
+Requires: zstd-filemap = %{version}-%{release}
 Requires: zstd-lib = %{version}-%{release}
 Requires: zstd-license = %{version}-%{release}
 Requires: zstd-man = %{version}-%{release}
@@ -46,6 +47,7 @@ C library, and a command line utility producing and decoding .zst, .gz, .xz and
 Summary: bin components for the zstd package.
 Group: Binaries
 Requires: zstd-license = %{version}-%{release}
+Requires: zstd-filemap = %{version}-%{release}
 
 %description bin
 bin components for the zstd package.
@@ -74,10 +76,19 @@ Requires: zstd-dev = %{version}-%{release}
 dev32 components for the zstd package.
 
 
+%package filemap
+Summary: filemap components for the zstd package.
+Group: Default
+
+%description filemap
+filemap components for the zstd package.
+
+
 %package lib
 Summary: lib components for the zstd package.
 Group: Libraries
 Requires: zstd-license = %{version}-%{release}
+Requires: zstd-filemap = %{version}-%{release}
 
 %description lib
 lib components for the zstd package.
@@ -146,7 +157,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1633017099
+export SOURCE_DATE_EPOCH=1633733595
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -168,9 +179,9 @@ export LDFLAGS_USE="$LDFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-
 pushd build/meson
 CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddir
 ninja -v -C builddir
-CFLAGS="$CFLAGS -m64 -march=x86-64-v3" CXXFLAGS="$CXXFLAGS -m64 -march=x86-64-v3 " LDFLAGS="$LDFLAGS -m64 -march=x86-64-v3" meson --libdir=lib64/x86-64-v3 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx2
+CFLAGS="$CFLAGS -m64 -march=x86-64-v3" CXXFLAGS="$CXXFLAGS -m64 -march=x86-64-v3 " LDFLAGS="$LDFLAGS -m64 -march=x86-64-v3" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx2
 ninja -v -C builddiravx2
-CFLAGS="$CFLAGS -m64 -march=skylake-avx512" CXXFLAGS="$CXXFLAGS -m64 -march=skylake-avx512 " LDFLAGS="$LDFLAGS -m64 -march=skylake-avx512" meson --libdir=lib64/haswell/avx512_1 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx512
+CFLAGS="$CFLAGS -m64 -march=x86-64-v4" CXXFLAGS="$CXXFLAGS -m64 -march=x86-64-v4 " LDFLAGS="$LDFLAGS -m64 -march=x86-64-v4" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx512
 ninja -v -C builddiravx512
 popd
 pushd ../build32/build/meson
@@ -203,15 +214,15 @@ popd
 fi
 popd
 pushd build/meson
-DESTDIR=%{buildroot} ninja -C builddiravx512 install
-DESTDIR=%{buildroot} ninja -C builddiravx2 install
+DESTDIR=%{buildroot}-v3 ninja -C builddiravx2 install
+/usr/bin/elf-move.py avx2 %{buildroot}-v3 %{buildroot}/usr/share/clear/optimized-elf/ %{buildroot}/usr/share/clear/filemap/filemap-%{name}
+DESTDIR=%{buildroot}-v4 ninja -C builddiravx512 install
+/usr/bin/elf-move.py avx512 %{buildroot}-v4 %{buildroot}/usr/share/clear/optimized-elf/ %{buildroot}/usr/share/clear/filemap/filemap-%{name}
 DESTDIR=%{buildroot} ninja -C builddir install
 popd
 
 %files
 %defattr(-,root,root,-)
-/usr/lib64/x86-64-v3/libzstd.a
-/usr/lib64/x86-64-v3/pkgconfig/libzstd.pc
 
 %files bin
 %defattr(-,root,root,-)
@@ -222,14 +233,13 @@ popd
 /usr/bin/zstdgrep
 /usr/bin/zstdless
 /usr/bin/zstdmt
+/usr/share/clear/optimized-elf/bin*
 
 %files dev
 %defattr(-,root,root,-)
 /usr/include/zdict.h
 /usr/include/zstd.h
 /usr/include/zstd_errors.h
-/usr/lib64/haswell/avx512_1/libzstd.so
-/usr/lib64/haswell/avx512_1/pkgconfig/libzstd.pc
 /usr/lib64/libzstd.so
 /usr/lib64/pkgconfig/libzstd.pc
 
@@ -239,15 +249,15 @@ popd
 /usr/lib32/pkgconfig/32libzstd.pc
 /usr/lib32/pkgconfig/libzstd.pc
 
+%files filemap
+%defattr(-,root,root,-)
+/usr/share/clear/filemap/filemap-zstd
+
 %files lib
 %defattr(-,root,root,-)
-/usr/lib64/haswell/avx512_1/libzstd.so.1
-/usr/lib64/haswell/avx512_1/libzstd.so.1.5.0
 /usr/lib64/libzstd.so.1
 /usr/lib64/libzstd.so.1.5.0
-/usr/lib64/x86-64-v3/libzstd.so
-/usr/lib64/x86-64-v3/libzstd.so.1
-/usr/lib64/x86-64-v3/libzstd.so.1.5.0
+/usr/share/clear/optimized-elf/lib*
 
 %files lib32
 %defattr(-,root,root,-)
@@ -270,7 +280,6 @@ popd
 
 %files staticdev
 %defattr(-,root,root,-)
-/usr/lib64/haswell/avx512_1/libzstd.a
 /usr/lib64/libzstd.a
 
 %files staticdev32
