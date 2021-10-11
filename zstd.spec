@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : zstd
 Version  : 1.5.0
-Release  : 76
+Release  : 77
 URL      : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source0  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source1  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz.sig
@@ -15,7 +15,6 @@ Summary  : Fast lossless compression algorithm library and tools
 Group    : Development/Tools
 License  : BSD-3-Clause GPL-2.0
 Requires: zstd-bin = %{version}-%{release}
-Requires: zstd-filemap = %{version}-%{release}
 Requires: zstd-lib = %{version}-%{release}
 Requires: zstd-license = %{version}-%{release}
 Requires: zstd-man = %{version}-%{release}
@@ -34,6 +33,7 @@ BuildRequires : zlib-dev
 BuildRequires : zlib-dev32
 Patch1: multi-thread-default.patch
 Patch2: notrace.patch
+Patch3: fopen-use-m.patch
 
 %description
 Zstandard, or zstd as short version, is a fast lossless compression algorithm,
@@ -47,7 +47,6 @@ C library, and a command line utility producing and decoding .zst, .gz, .xz and
 Summary: bin components for the zstd package.
 Group: Binaries
 Requires: zstd-license = %{version}-%{release}
-Requires: zstd-filemap = %{version}-%{release}
 
 %description bin
 bin components for the zstd package.
@@ -65,42 +64,13 @@ Requires: zstd = %{version}-%{release}
 dev components for the zstd package.
 
 
-%package dev32
-Summary: dev32 components for the zstd package.
-Group: Default
-Requires: zstd-lib32 = %{version}-%{release}
-Requires: zstd-bin = %{version}-%{release}
-Requires: zstd-dev = %{version}-%{release}
-
-%description dev32
-dev32 components for the zstd package.
-
-
-%package filemap
-Summary: filemap components for the zstd package.
-Group: Default
-
-%description filemap
-filemap components for the zstd package.
-
-
 %package lib
 Summary: lib components for the zstd package.
 Group: Libraries
 Requires: zstd-license = %{version}-%{release}
-Requires: zstd-filemap = %{version}-%{release}
 
 %description lib
 lib components for the zstd package.
-
-
-%package lib32
-Summary: lib32 components for the zstd package.
-Group: Default
-Requires: zstd-license = %{version}-%{release}
-
-%description lib32
-lib32 components for the zstd package.
 
 
 %package license
@@ -128,28 +98,14 @@ Requires: zstd-dev = %{version}-%{release}
 staticdev components for the zstd package.
 
 
-%package staticdev32
-Summary: staticdev32 components for the zstd package.
-Group: Default
-Requires: zstd-dev = %{version}-%{release}
-
-%description staticdev32
-staticdev32 components for the zstd package.
-
-
 %prep
 %setup -q -n zstd-1.5.0
 cd %{_builddir}/zstd-1.5.0
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 pushd ..
 cp -a zstd-1.5.0 build32
-popd
-pushd ..
-cp -a zstd-1.5.0 buildavx2
-popd
-pushd ..
-cp -a zstd-1.5.0 buildavx512
 popd
 
 %build
@@ -157,7 +113,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1633807155
+export SOURCE_DATE_EPOCH=1633967505
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -166,56 +122,25 @@ export CFLAGS="$CFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=a
 export FCFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
 export FFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
 export CXXFLAGS="$CXXFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
-export CFLAGS_GENERATE="$CFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export FCFLAGS_GENERATE="$FCFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export FFLAGS_GENERATE="$FFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export CXXFLAGS_GENERATE="$CXXFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export LDFLAGS_GENERATE="$LDFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export CFLAGS_USE="$CFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-export FCFLAGS_USE="$FCFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-export FFLAGS_USE="$FFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-export CXXFLAGS_USE="$CXXFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-export LDFLAGS_USE="$LDFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-pushd build/meson
-CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddir
-ninja -v -C builddir
-CFLAGS="$CFLAGS_GENERATE -m64 -march=x86-64-v3 -O3" CXXFLAGS="$CXXFLAGS_GENERATE -m64 -march=x86-64-v3 " LDFLAGS="$LDFLAGS_GENERATE -m64 -march=x86-64-v3" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx2
-ninja -v -C builddiravx2
-pushd builddiravx2
-cat ../*/*/*.c */* | programs/zstd -9 | programs/zstd -d > /dev/null
-cat ../*/*/*.c */* | programs/zstd -1 | programs/zstd -d > /dev/null
-cat ../*/*/*.c */* | programs/zstd -19 | programs/zstd -d > /dev/null
-popd
-rm -rf builddiravx2
-CFLAGS="$CFLAGS_USE -m64 -march=x86-64-v3 -O3" CXXFLAGS="$CXXFLAGS_USE -m64 -march=x86-64-v3 " LDFLAGS="$LDFLAGS_USE -m64 -march=x86-64-v3" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx2
-ninja -v -C builddiravx2
-CFLAGS="$CFLAGS_GENERATE -m64 -march=x86-64-v4 -O3" CXXFLAGS="$CXXFLAGS_GENERATE -m64 -march=x86-64-v4 " LDFLAGS="$LDFLAGS_GENERATE -m64 -march=x86-64-v4" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx512
-ninja -v -C builddiravx512
-pushd builddiravx512
-cat ../*/*/*.c */* | programs/zstd -9 | programs/zstd -d > /dev/null
-cat ../*/*/*.c */* | programs/zstd -1 | programs/zstd -d > /dev/null
-cat ../*/*/*.c */* | programs/zstd -19 | programs/zstd -d > /dev/null
-popd
-rm -rf builddiravx512
-CFLAGS="$CFLAGS_USE -m64 -march=x86-64-v4 -O3" CXXFLAGS="$CXXFLAGS_USE -m64 -march=x86-64-v4 " LDFLAGS="$LDFLAGS_USE -m64 -march=x86-64-v4" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx512
-ninja -v -C builddiravx512
-popd
-pushd ../build32/build/meson
+make  PREFIX=%{_prefix} LIBDIR=%{_libdir} lib zstd
+
+pushd ../build32/
 export PKG_CONFIG_PATH="/usr/lib32/pkgconfig:/usr/share/pkgconfig"
 export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
 export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32 -mstackrealign"
 export CXXFLAGS="${CXXFLAGS}${CXXFLAGS:+ }-m32 -mstackrealign"
 export LDFLAGS="${LDFLAGS}${LDFLAGS:+ }-m32 -mstackrealign"
-meson --libdir=lib32 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddir
-ninja -v -C builddir
+make  PREFIX=%{_prefix} LIBDIR=%{_libdir} lib zstd
 popd
 
 %install
+export SOURCE_DATE_EPOCH=1633967505
+rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/zstd
 cp %{_builddir}/zstd-1.5.0/COPYING %{buildroot}/usr/share/package-licenses/zstd/1d8c93712cbc9117a9e55a7ff86cebd066c8bfd8
 cp %{_builddir}/zstd-1.5.0/LICENSE %{buildroot}/usr/share/package-licenses/zstd/c4130945ca3d1f8ea4a3e8af36d3c18b2232116c
-pushd ../build32/build/meson
-DESTDIR=%{buildroot} ninja -C builddir install
+pushd ../build32/
+%make_install32 PREFIX=%{_prefix} LIBDIR=%{_libdir}
 if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
 then
 pushd %{buildroot}/usr/lib32/pkgconfig
@@ -229,13 +154,7 @@ for i in *.pc ; do ln -s $i 32$i ; done
 popd
 fi
 popd
-pushd build/meson
-DESTDIR=%{buildroot}-v3 ninja -C builddiravx2 install
-/usr/bin/elf-move.py avx2 %{buildroot}-v3 %{buildroot}/usr/share/clear/optimized-elf/ %{buildroot}/usr/share/clear/filemap/filemap-%{name}
-DESTDIR=%{buildroot}-v4 ninja -C builddiravx512 install
-/usr/bin/elf-move.py avx512 %{buildroot}-v4 %{buildroot}/usr/share/clear/optimized-elf/ %{buildroot}/usr/share/clear/filemap/filemap-%{name}
-DESTDIR=%{buildroot} ninja -C builddir install
-popd
+%make_install PREFIX=%{_prefix} LIBDIR=%{_libdir}
 
 %files
 %defattr(-,root,root,-)
@@ -244,12 +163,10 @@ popd
 %defattr(-,root,root,-)
 /usr/bin/unzstd
 /usr/bin/zstd
-/usr/bin/zstd-frugal
 /usr/bin/zstdcat
 /usr/bin/zstdgrep
 /usr/bin/zstdless
 /usr/bin/zstdmt
-/usr/share/clear/optimized-elf/bin*
 
 %files dev
 %defattr(-,root,root,-)
@@ -259,26 +176,10 @@ popd
 /usr/lib64/libzstd.so
 /usr/lib64/pkgconfig/libzstd.pc
 
-%files dev32
-%defattr(-,root,root,-)
-/usr/lib32/libzstd.so
-/usr/lib32/pkgconfig/32libzstd.pc
-/usr/lib32/pkgconfig/libzstd.pc
-
-%files filemap
-%defattr(-,root,root,-)
-/usr/share/clear/filemap/filemap-zstd
-
 %files lib
 %defattr(-,root,root,-)
 /usr/lib64/libzstd.so.1
 /usr/lib64/libzstd.so.1.5.0
-/usr/share/clear/optimized-elf/lib*
-
-%files lib32
-%defattr(-,root,root,-)
-/usr/lib32/libzstd.so.1
-/usr/lib32/libzstd.so.1.5.0
 
 %files license
 %defattr(0644,root,root,0755)
@@ -292,12 +193,7 @@ popd
 /usr/share/man/man1/zstdcat.1
 /usr/share/man/man1/zstdgrep.1
 /usr/share/man/man1/zstdless.1
-/usr/share/man/man1/zstdmt.1
 
 %files staticdev
 %defattr(-,root,root,-)
 /usr/lib64/libzstd.a
-
-%files staticdev32
-%defattr(-,root,root,-)
-/usr/lib32/libzstd.a
