@@ -7,18 +7,16 @@
 %define keepstatic 1
 Name     : zstd
 Version  : 1.5.0
-Release  : 79
+Release  : 80
 URL      : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source0  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
 Source1  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz.sig
 Summary  : Fast lossless compression algorithm library and tools
 Group    : Development/Tools
 License  : BSD-3-Clause GPL-2.0
-Requires: zstd-bin = %{version}-%{release}
 Requires: zstd-filemap = %{version}-%{release}
 Requires: zstd-lib = %{version}-%{release}
 Requires: zstd-license = %{version}-%{release}
-Requires: zstd-man = %{version}-%{release}
 BuildRequires : buildreq-cmake
 BuildRequires : buildreq-meson
 BuildRequires : gcc-dev32
@@ -45,21 +43,10 @@ library. The project is provided as an open-source dual BSD and GPLv2 licensed
 C library, and a command line utility producing and decoding .zst, .gz, .xz and
 .lz4 files.
 
-%package bin
-Summary: bin components for the zstd package.
-Group: Binaries
-Requires: zstd-license = %{version}-%{release}
-Requires: zstd-filemap = %{version}-%{release}
-
-%description bin
-bin components for the zstd package.
-
-
 %package dev
 Summary: dev components for the zstd package.
 Group: Development
 Requires: zstd-lib = %{version}-%{release}
-Requires: zstd-bin = %{version}-%{release}
 Provides: zstd-devel = %{version}-%{release}
 Requires: zstd = %{version}-%{release}
 
@@ -71,7 +58,6 @@ dev components for the zstd package.
 Summary: dev32 components for the zstd package.
 Group: Default
 Requires: zstd-lib32 = %{version}-%{release}
-Requires: zstd-bin = %{version}-%{release}
 Requires: zstd-dev = %{version}-%{release}
 
 %description dev32
@@ -111,14 +97,6 @@ Group: Default
 
 %description license
 license components for the zstd package.
-
-
-%package man
-Summary: man components for the zstd package.
-Group: Default
-
-%description man
-man components for the zstd package.
 
 
 %package staticdev
@@ -161,7 +139,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1633975440
+export SOURCE_DATE_EPOCH=1633976637
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -170,38 +148,15 @@ export CFLAGS="$CFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=a
 export FCFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
 export FFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
 export CXXFLAGS="$CXXFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
-export CFLAGS_GENERATE="$CFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export FCFLAGS_GENERATE="$FCFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export FFLAGS_GENERATE="$FFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export CXXFLAGS_GENERATE="$CXXFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export LDFLAGS_GENERATE="$LDFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export CFLAGS_USE="$CFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-export FCFLAGS_USE="$FCFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-export FFLAGS_USE="$FFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-export CXXFLAGS_USE="$CXXFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-export LDFLAGS_USE="$LDFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
 pushd build/meson
-CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddir
+CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both \
+-Dbin_programs=false  builddir
 ninja -v -C builddir
-CFLAGS="$CFLAGS_GENERATE -m64 -march=x86-64-v3 -O3" CXXFLAGS="$CXXFLAGS_GENERATE -m64 -march=x86-64-v3 " LDFLAGS="$LDFLAGS_GENERATE -m64 -march=x86-64-v3" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx2
+CFLAGS="$CFLAGS -m64 -march=x86-64-v3 -O3" CXXFLAGS="$CXXFLAGS -m64 -march=x86-64-v3 " LDFLAGS="$LDFLAGS -m64 -march=x86-64-v3" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both \
+-Dbin_programs=false  builddiravx2
 ninja -v -C builddiravx2
-pushd builddiravx2
-cat ../*/*/*.c */* | programs/zstd -9 | programs/zstd -d > /dev/null
-cat ../*/*/*.c */* | programs/zstd -1 | programs/zstd -d > /dev/null
-cat ../*/*/*.c */* | programs/zstd -19 | programs/zstd -d > /dev/null
-popd
-rm -rf builddiravx2
-CFLAGS="$CFLAGS_USE -m64 -march=x86-64-v3 -O3" CXXFLAGS="$CXXFLAGS_USE -m64 -march=x86-64-v3 " LDFLAGS="$LDFLAGS_USE -m64 -march=x86-64-v3" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx2
-ninja -v -C builddiravx2
-CFLAGS="$CFLAGS_GENERATE -m64 -march=x86-64-v4 -O3" CXXFLAGS="$CXXFLAGS_GENERATE -m64 -march=x86-64-v4 " LDFLAGS="$LDFLAGS_GENERATE -m64 -march=x86-64-v4" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx512
-ninja -v -C builddiravx512
-pushd builddiravx512
-cat ../*/*/*.c */* | programs/zstd -9 | programs/zstd -d > /dev/null
-cat ../*/*/*.c */* | programs/zstd -1 | programs/zstd -d > /dev/null
-cat ../*/*/*.c */* | programs/zstd -19 | programs/zstd -d > /dev/null
-popd
-rm -rf builddiravx512
-CFLAGS="$CFLAGS_USE -m64 -march=x86-64-v4 -O3" CXXFLAGS="$CXXFLAGS_USE -m64 -march=x86-64-v4 " LDFLAGS="$LDFLAGS_USE -m64 -march=x86-64-v4" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddiravx512
+CFLAGS="$CFLAGS -m64 -march=x86-64-v4 -O3" CXXFLAGS="$CXXFLAGS -m64 -march=x86-64-v4 " LDFLAGS="$LDFLAGS -m64 -march=x86-64-v4" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both \
+-Dbin_programs=false  builddiravx512
 ninja -v -C builddiravx512
 popd
 pushd ../build32/build/meson
@@ -210,7 +165,8 @@ export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
 export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32 -mstackrealign"
 export CXXFLAGS="${CXXFLAGS}${CXXFLAGS:+ }-m32 -mstackrealign"
 export LDFLAGS="${LDFLAGS}${LDFLAGS:+ }-m32 -mstackrealign"
-meson --libdir=lib32 --prefix=/usr --buildtype=plain -Ddefault_library=both  builddir
+meson --libdir=lib32 --prefix=/usr --buildtype=plain -Ddefault_library=both \
+-Dbin_programs=false  builddir
 ninja -v -C builddir
 popd
 
@@ -243,17 +199,6 @@ popd
 
 %files
 %defattr(-,root,root,-)
-
-%files bin
-%defattr(-,root,root,-)
-/usr/bin/unzstd
-/usr/bin/zstd
-/usr/bin/zstd-frugal
-/usr/bin/zstdcat
-/usr/bin/zstdgrep
-/usr/bin/zstdless
-/usr/bin/zstdmt
-/usr/share/clear/optimized-elf/bin*
 
 %files dev
 %defattr(-,root,root,-)
@@ -288,15 +233,6 @@ popd
 %defattr(0644,root,root,0755)
 /usr/share/package-licenses/zstd/1d8c93712cbc9117a9e55a7ff86cebd066c8bfd8
 /usr/share/package-licenses/zstd/c4130945ca3d1f8ea4a3e8af36d3c18b2232116c
-
-%files man
-%defattr(0644,root,root,0755)
-/usr/share/man/man1/unzstd.1
-/usr/share/man/man1/zstd.1
-/usr/share/man/man1/zstdcat.1
-/usr/share/man/man1/zstdgrep.1
-/usr/share/man/man1/zstdless.1
-/usr/share/man/man1/zstdmt.1
 
 %files staticdev
 %defattr(-,root,root,-)

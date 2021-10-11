@@ -1,1 +1,2 @@
 -Ddefault_library=both
+-Dbin_programs=false
