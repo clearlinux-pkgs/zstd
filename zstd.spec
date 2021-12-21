@@ -6,11 +6,11 @@
 #
 %define keepstatic 1
 Name     : zstd
-Version  : 1.5.0
-Release  : 83
-URL      : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
-Source0  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz
-Source1  : https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz.sig
+Version  : 1.5.1
+Release  : 84
+URL      : https://github.com/facebook/zstd/releases/download/v1.5.1/zstd-1.5.1.tar.gz
+Source0  : https://github.com/facebook/zstd/releases/download/v1.5.1/zstd-1.5.1.tar.gz
+Source1  : https://github.com/facebook/zstd/releases/download/v1.5.1/zstd-1.5.1.tar.gz.sig
 Summary  : Fast lossless compression algorithm library and tools
 Group    : Development/Tools
 License  : BSD-3-Clause GPL-2.0
@@ -31,11 +31,9 @@ BuildRequires : xz-dev
 BuildRequires : xz-dev32
 BuildRequires : zlib-dev
 BuildRequires : zlib-dev32
-BuildRequires : zstd-bin
 Patch1: multi-thread-default.patch
 Patch2: notrace.patch
 Patch3: fopen-use-m.patch
-Patch4: allowpgo.patch
 
 %description
 Zstandard, or zstd as short version, is a fast lossless compression algorithm,
@@ -120,20 +118,19 @@ staticdev32 components for the zstd package.
 
 
 %prep
-%setup -q -n zstd-1.5.0
-cd %{_builddir}/zstd-1.5.0
+%setup -q -n zstd-1.5.1
+cd %{_builddir}/zstd-1.5.1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
 pushd ..
-cp -a zstd-1.5.0 build32
+cp -a zstd-1.5.1 build32
 popd
 pushd ..
-cp -a zstd-1.5.0 buildavx2
+cp -a zstd-1.5.1 buildavx2
 popd
 pushd ..
-cp -a zstd-1.5.0 buildavx512
+cp -a zstd-1.5.1 buildavx512
 popd
 
 %build
@@ -141,15 +138,20 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1634686374
+export SOURCE_DATE_EPOCH=1640117532
 export GCC_IGNORE_WERROR=1
+export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
+export CXXFLAGS=$CFLAGS
+export FFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
+export FCFLAGS=$FFLAGS
+unset LDFLAGS
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
-export FCFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
-export FFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
-export CXXFLAGS="$CXXFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
+export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=auto "
+export FCFLAGS="$FFLAGS -O3 -ffat-lto-objects -flto=auto "
+export FFLAGS="$FFLAGS -O3 -ffat-lto-objects -flto=auto "
+export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=auto "
 pushd build/meson
 CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both \
 -Dbin_programs=false  builddir
@@ -174,8 +176,8 @@ popd
 
 %install
 mkdir -p %{buildroot}/usr/share/package-licenses/zstd
-cp %{_builddir}/zstd-1.5.0/COPYING %{buildroot}/usr/share/package-licenses/zstd/1d8c93712cbc9117a9e55a7ff86cebd066c8bfd8
-cp %{_builddir}/zstd-1.5.0/LICENSE %{buildroot}/usr/share/package-licenses/zstd/c4130945ca3d1f8ea4a3e8af36d3c18b2232116c
+cp %{_builddir}/zstd-1.5.1/COPYING %{buildroot}/usr/share/package-licenses/zstd/1d8c93712cbc9117a9e55a7ff86cebd066c8bfd8
+cp %{_builddir}/zstd-1.5.1/LICENSE %{buildroot}/usr/share/package-licenses/zstd/c4130945ca3d1f8ea4a3e8af36d3c18b2232116c
 pushd ../build32/build/meson
 DESTDIR=%{buildroot} ninja -C builddir install
 if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
@@ -223,13 +225,13 @@ popd
 %files lib
 %defattr(-,root,root,-)
 /usr/lib64/libzstd.so.1
-/usr/lib64/libzstd.so.1.5.0
+/usr/lib64/libzstd.so.1.5.1
 /usr/share/clear/optimized-elf/lib*
 
 %files lib32
 %defattr(-,root,root,-)
 /usr/lib32/libzstd.so.1
-/usr/lib32/libzstd.so.1.5.0
+/usr/lib32/libzstd.so.1.5.1
 
 %files license
 %defattr(0644,root,root,0755)
