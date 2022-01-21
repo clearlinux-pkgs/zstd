@@ -1,5 +1,3 @@
-libzstd.so.1:HUF_decompress4X1_usingDTable_internal_bmi2_asm_loop
-libzstd.so.1:HUF_decompress4X2_usingDTable_internal_bmi2_asm_loop
 libzstd.so.1:ZDICT_addEntropyTablesFromBuffer
 libzstd.so.1:ZDICT_finalizeDictionary
 libzstd.so.1:ZDICT_getDictHeaderSize
@@ -179,5 +177,3 @@ libzstd.so.1:ZSTD_toFlushNow
 libzstd.so.1:ZSTD_versionNumber
 libzstd.so.1:ZSTD_versionString
 libzstd.so.1:ZSTD_writeSkippableFrame
-libzstd.so.1:_HUF_decompress4X1_usingDTable_internal_bmi2_asm_loop
-libzstd.so.1:_HUF_decompress4X2_usingDTable_internal_bmi2_asm_loop
