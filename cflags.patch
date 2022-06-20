@@ -1,0 +1,10 @@
+--- zstd-1.5.2/build/meson/lib/meson.build~	2022-01-20 21:17:18.000000000 +0000
++++ zstd-1.5.2/build/meson/lib/meson.build	2022-06-20 16:05:17.931504782 +0000
+@@ -112,6 +112,7 @@
+   endif
+ endif
+ libzstd_c_args += cc.get_supported_arguments(libzstd_debug_cflags)
++libzstd_c_args += '-std=gnu11'
+ 
+ libzstd = library('zstd',
+   libzstd_sources,

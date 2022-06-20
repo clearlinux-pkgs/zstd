@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : zstd
 Version  : 1.5.2
-Release  : 87
+Release  : 88
 URL      : https://github.com/facebook/zstd/releases/download/v1.5.2/zstd-1.5.2.tar.gz
 Source0  : https://github.com/facebook/zstd/releases/download/v1.5.2/zstd-1.5.2.tar.gz
 Source1  : https://github.com/facebook/zstd/releases/download/v1.5.2/zstd-1.5.2.tar.gz.sig
@@ -34,6 +34,7 @@ BuildRequires : zlib-dev32
 Patch1: multi-thread-default.patch
 Patch2: notrace.patch
 Patch3: fopen-use-m.patch
+Patch4: cflags.patch
 
 %description
 Zstandard, or zstd as short version, is a fast lossless compression algorithm,
@@ -123,6 +124,7 @@ cd %{_builddir}/zstd-1.5.2
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 pushd ..
 cp -a zstd-1.5.2 build32
 popd
@@ -138,7 +140,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1642724402
+export SOURCE_DATE_EPOCH=1655741253
 export GCC_IGNORE_WERROR=1
 export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
 export CXXFLAGS=$CFLAGS
