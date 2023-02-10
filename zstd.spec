@@ -6,11 +6,11 @@
 #
 %define keepstatic 1
 Name     : zstd
-Version  : 1.5.2
-Release  : 100
-URL      : https://github.com/facebook/zstd/releases/download/v1.5.2/zstd-1.5.2.tar.gz
-Source0  : https://github.com/facebook/zstd/releases/download/v1.5.2/zstd-1.5.2.tar.gz
-Source1  : https://github.com/facebook/zstd/releases/download/v1.5.2/zstd-1.5.2.tar.gz.sig
+Version  : 1.5.4
+Release  : 101
+URL      : https://github.com/facebook/zstd/releases/download/v1.5.4/zstd-1.5.4.tar.gz
+Source0  : https://github.com/facebook/zstd/releases/download/v1.5.4/zstd-1.5.4.tar.gz
+Source1  : https://github.com/facebook/zstd/releases/download/v1.5.4/zstd-1.5.4.tar.gz.sig
 Summary  : Fast lossless compression algorithm library and tools
 Group    : Development/Tools
 License  : BSD-3-Clause GPL-2.0
@@ -112,20 +112,20 @@ staticdev32 components for the zstd package.
 
 
 %prep
-%setup -q -n zstd-1.5.2
-cd %{_builddir}/zstd-1.5.2
+%setup -q -n zstd-1.5.4
+cd %{_builddir}/zstd-1.5.4
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
 pushd ..
-cp -a zstd-1.5.2 build32
+cp -a zstd-1.5.4 build32
 popd
 pushd ..
-cp -a zstd-1.5.2 buildavx2
+cp -a zstd-1.5.4 buildavx2
 popd
 pushd ..
-cp -a zstd-1.5.2 buildavx512
+cp -a zstd-1.5.4 buildavx512
 popd
 
 %build
@@ -133,11 +133,11 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1672249732
+export SOURCE_DATE_EPOCH=1676055333
 export GCC_IGNORE_WERROR=1
-export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
+export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere"
 export CXXFLAGS=$CFLAGS
-export FFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
+export FFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere"
 export FCFLAGS=$FFLAGS
 unset LDFLAGS
 export AR=gcc-ar
@@ -154,7 +154,7 @@ ninja -v -C builddir
 CFLAGS="$CFLAGS -m64 -march=x86-64-v3 -Wl,-z,x86-64-v3 -O3" CXXFLAGS="$CXXFLAGS -m64 -march=x86-64-v3 -Wl,-z,x86-64-v3 " LDFLAGS="$LDFLAGS -m64 -march=x86-64-v3" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both \
 -Dbin_programs=false  builddiravx2
 ninja -v -C builddiravx2
-CFLAGS="$CFLAGS -m64 -march=x86-64-v4 -Wl,-z,x86-64-v4 -O3" CXXFLAGS="$CXXFLAGS -m64 -march=x86-64-v4 -Wl,-z,x86-64-v4 " LDFLAGS="$LDFLAGS -m64 -march=x86-64-v4" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both \
+CFLAGS="$CFLAGS -m64 -march=x86-64-v4 -Wl,-z,x86-64-v4 -O3 -mprefer-vector-width=512" CXXFLAGS="$CXXFLAGS -m64 -march=x86-64-v4 -Wl,-z,x86-64-v4 -mprefer-vector-width=512" LDFLAGS="$LDFLAGS -m64 -march=x86-64-v4" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both \
 -Dbin_programs=false  builddiravx512
 ninja -v -C builddiravx512
 popd
@@ -171,8 +171,8 @@ popd
 
 %install
 mkdir -p %{buildroot}/usr/share/package-licenses/zstd
-cp %{_builddir}/zstd-%{version}/COPYING %{buildroot}/usr/share/package-licenses/zstd/1d8c93712cbc9117a9e55a7ff86cebd066c8bfd8
-cp %{_builddir}/zstd-%{version}/LICENSE %{buildroot}/usr/share/package-licenses/zstd/c4130945ca3d1f8ea4a3e8af36d3c18b2232116c
+cp %{_builddir}/zstd-%{version}/COPYING %{buildroot}/usr/share/package-licenses/zstd/1d8c93712cbc9117a9e55a7ff86cebd066c8bfd8 || :
+cp %{_builddir}/zstd-%{version}/LICENSE %{buildroot}/usr/share/package-licenses/zstd/d5e630eee1d3500039f2e16bed21d0f0cd580994 || :
 pushd ../build32/build/meson
 DESTDIR=%{buildroot} ninja -C builddir install
 if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
@@ -218,21 +218,21 @@ popd
 %files lib
 %defattr(-,root,root,-)
 /usr/lib64/glibc-hwcaps/x86-64-v3/libzstd.so.1
-/usr/lib64/glibc-hwcaps/x86-64-v3/libzstd.so.1.5.2
+/usr/lib64/glibc-hwcaps/x86-64-v3/libzstd.so.1.5.4
 /usr/lib64/glibc-hwcaps/x86-64-v4/libzstd.so.1
-/usr/lib64/glibc-hwcaps/x86-64-v4/libzstd.so.1.5.2
+/usr/lib64/glibc-hwcaps/x86-64-v4/libzstd.so.1.5.4
 /usr/lib64/libzstd.so.1
-/usr/lib64/libzstd.so.1.5.2
+/usr/lib64/libzstd.so.1.5.4
 
 %files lib32
 %defattr(-,root,root,-)
 /usr/lib32/libzstd.so.1
-/usr/lib32/libzstd.so.1.5.2
+/usr/lib32/libzstd.so.1.5.4
 
 %files license
 %defattr(0644,root,root,0755)
 /usr/share/package-licenses/zstd/1d8c93712cbc9117a9e55a7ff86cebd066c8bfd8
-/usr/share/package-licenses/zstd/c4130945ca3d1f8ea4a3e8af36d3c18b2232116c
+/usr/share/package-licenses/zstd/d5e630eee1d3500039f2e16bed21d0f0cd580994
 
 %files staticdev
 %defattr(-,root,root,-)
