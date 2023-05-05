@@ -8,7 +8,7 @@
 %define keepstatic 1
 Name     : zstd
 Version  : 1.5.5
-Release  : 102
+Release  : 103
 URL      : https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz
 Source0  : https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz
 Source1  : https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz.sig
@@ -133,7 +133,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1680649503
+export SOURCE_DATE_EPOCH=1683247087
 export GCC_IGNORE_WERROR=1
 export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere"
 export CXXFLAGS=$CFLAGS
@@ -143,10 +143,10 @@ unset LDFLAGS
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz "
-export FCFLAGS="$FFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz "
-export FFLAGS="$FFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz "
-export CXXFLAGS="$CXXFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz "
+export CFLAGS="$CFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
+export FCFLAGS="$FFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
+export FFLAGS="$FFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
+export CXXFLAGS="$CXXFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
 pushd build/meson
 CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both \
 -Dbin_programs=false  builddir
@@ -201,11 +201,11 @@ popd
 
 %files dev
 %defattr(-,root,root,-)
+/V3/usr/lib64/libzstd.so
+/V4/usr/lib64/libzstd.so
 /usr/include/zdict.h
 /usr/include/zstd.h
 /usr/include/zstd_errors.h
-/usr/lib64/glibc-hwcaps/x86-64-v3/libzstd.so
-/usr/lib64/glibc-hwcaps/x86-64-v4/libzstd.so
 /usr/lib64/libzstd.so
 /usr/lib64/pkgconfig/libzstd.pc
 
@@ -217,10 +217,10 @@ popd
 
 %files lib
 %defattr(-,root,root,-)
-/usr/lib64/glibc-hwcaps/x86-64-v3/libzstd.so.1
-/usr/lib64/glibc-hwcaps/x86-64-v3/libzstd.so.1.5.5
-/usr/lib64/glibc-hwcaps/x86-64-v4/libzstd.so.1
-/usr/lib64/glibc-hwcaps/x86-64-v4/libzstd.so.1.5.5
+/V3/usr/lib64/libzstd.so.1
+/V3/usr/lib64/libzstd.so.1.5.5
+/V4/usr/lib64/libzstd.so.1
+/V4/usr/lib64/libzstd.so.1.5.5
 /usr/lib64/libzstd.so.1
 /usr/lib64/libzstd.so.1.5.5
 
@@ -236,8 +236,6 @@ popd
 
 %files staticdev
 %defattr(-,root,root,-)
-/usr/lib64/glibc-hwcaps/x86-64-v3/libzstd.a
-/usr/lib64/glibc-hwcaps/x86-64-v4/libzstd.a
 /usr/lib64/libzstd.a
 
 %files staticdev32
