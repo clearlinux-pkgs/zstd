@@ -8,7 +8,7 @@
 %define keepstatic 1
 Name     : zstd
 Version  : 1.5.5
-Release  : 103
+Release  : 104
 URL      : https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz
 Source0  : https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz
 Source1  : https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz.sig
@@ -133,7 +133,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1683247087
+export SOURCE_DATE_EPOCH=1685476098
 export GCC_IGNORE_WERROR=1
 export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere"
 export CXXFLAGS=$CFLAGS
@@ -201,8 +201,6 @@ popd
 
 %files dev
 %defattr(-,root,root,-)
-/V3/usr/lib64/libzstd.so
-/V4/usr/lib64/libzstd.so
 /usr/include/zdict.h
 /usr/include/zstd.h
 /usr/include/zstd_errors.h
@@ -217,9 +215,7 @@ popd
 
 %files lib
 %defattr(-,root,root,-)
-/V3/usr/lib64/libzstd.so.1
 /V3/usr/lib64/libzstd.so.1.5.5
-/V4/usr/lib64/libzstd.so.1
 /V4/usr/lib64/libzstd.so.1.5.5
 /usr/lib64/libzstd.so.1
 /usr/lib64/libzstd.so.1.5.5
