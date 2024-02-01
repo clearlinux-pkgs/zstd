@@ -10,7 +10,7 @@
 %define keepstatic 1
 Name     : zstd
 Version  : 1.5.5
-Release  : 107
+Release  : 108
 URL      : https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz
 Source0  : https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz
 Source1  : https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz.sig
