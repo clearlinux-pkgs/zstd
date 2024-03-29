@@ -10,7 +10,7 @@
 %define keepstatic 1
 Name     : zstd
 Version  : 1.5.6
-Release  : 109
+Release  : 110
 URL      : https://github.com/facebook/zstd/releases/download/v1.5.6/zstd-1.5.6.tar.gz
 Source0  : https://github.com/facebook/zstd/releases/download/v1.5.6/zstd-1.5.6.tar.gz
 Source1  : https://github.com/facebook/zstd/releases/download/v1.5.6/zstd-1.5.6.tar.gz.sig
@@ -28,8 +28,8 @@ BuildRequires : glibc-dev32
 BuildRequires : glibc-libc32
 BuildRequires : lz4-dev
 BuildRequires : lz4-dev32
-BuildRequires : xz-dev
-BuildRequires : xz-dev32
+BuildRequires : pkgconfig(32liblzma)
+BuildRequires : pkgconfig(liblzma)
 BuildRequires : zlib-dev
 BuildRequires : zlib-dev32
 # Suppress stripping binaries
@@ -135,7 +135,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1711512509
+export SOURCE_DATE_EPOCH=1711735889
 export GCC_IGNORE_WERROR=1
 CLEAR_INTERMEDIATE_CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere"
 CLEAR_INTERMEDIATE_CXXFLAGS=$CLEAR_INTERMEDIATE_CFLAGS
