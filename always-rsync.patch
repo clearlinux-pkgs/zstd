@@ -1,0 +1,15 @@
+--- zstd-1.5.6/lib/compress/zstdmt_compress.c~	2024-03-21 22:05:51.000000000 +0000
++++ zstd-1.5.6/lib/compress/zstdmt_compress.c	2025-01-08 22:05:51.862966686 +0000
+@@ -1715,9 +1715,9 @@
+ 
+     syncPoint.toLoad = MIN(input.size - input.pos, mtctx->targetSectionSize - mtctx->inBuff.filled);
+     syncPoint.flush = 0;
+-    if (!mtctx->params.rsyncable)
+-        /* Rsync is disabled. */
+-        return syncPoint;
++//    if (!mtctx->params.rsyncable)
++//        /* Rsync is disabled. */
++//        return syncPoint;
+     if (mtctx->inBuff.filled + input.size - input.pos < RSYNC_MIN_BLOCK_SIZE)
+         /* We don't emit synchronization points if it would produce too small blocks.
+          * We don't have enough input to find a synchronization point, so don't look.

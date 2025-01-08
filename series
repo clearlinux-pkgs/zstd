@@ -3,3 +3,5 @@ notrace.patch
 fopen-use-m.patch
 #allowpgo.patch
 cflags.patch
+rsyncable-always.patch
+always-rsync.patch
